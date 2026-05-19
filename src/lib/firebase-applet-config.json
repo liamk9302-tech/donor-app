@@ -1,10 +1,9 @@
 {
-  "projectId": "charged-talent-s71nt",
-  "appId": "1:513528255254:web:e77fa43391169ea1507637",
-  "apiKey": "AIzaSyCdLnDsKCZUBpdUagVgFFEs4zDwdPP8ji0",
-  "authDomain": "charged-talent-s71nt.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-f5543982-b9e7-4541-8d77-4ed93d59eea9",
-  "storageBucket": "charged-talent-s71nt.firebasestorage.app",
-  "messagingSenderId": "513528255254",
-  "measurementId": ""
+  "apiKey": "AIzaSyCyRbrofRisrytwcMtz5NHmlZ9v2dH99Wo",
+  "authDomain": "goodcircle.firebaseapp.com",
+  "projectId": "goodcircle",
+  "storageBucket": "goodcircle.firebasestorage.app",
+  "messagingSenderId": "476507178039",
+  "appId": "1:476507178039:web:a94a8355e74825efc32bb2",
+  "measurementId": "G-ZT9HK06JQM"
 }
