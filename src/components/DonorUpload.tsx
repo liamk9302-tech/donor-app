@@ -25,56 +25,27 @@ export function DonorUpload({ campaignId }: { campaignId: string }) {
       header: true,
       skipEmptyLines: true,
       transformHeader: (header) => header.trim(),
-      complete: async (results: any) => {
-  try {
-    const rows = Array.isArray(results.data) ? results.data : [];
+      complete: async (results) => {
+        try {
+          const donors = results.data as any[];
+          const batch = donors.map(d => {
+            // Helper to get value from multiple possible header keys
+            const getVal = (keys: string[]) => {
+              const key = Object.keys(d).find(k => keys.includes(k.toLowerCase().replace(/[^a-z]/g, '')));
+              return key ? d[key] : '';
+            };
 
-    const getVal = (d: any, keys: string[]) => {
-      const key = Object.keys(d).find((k) =>
-        keys.includes(k.toLowerCase().replace(/[^a-z]/g, ""))
-      );
-      return key ? d[key] : "";
-    };
+            const name = getVal(['name', 'donor', 'donorname', 'fullname', 'names', 'addressee']) || 'Unknown';
+            const email = getVal(['email', 'emailaddress', 'mail']);
+            const phone = getVal(['phone', 'phonenumber', 'cell', 'mobile', 'tel']);
+            const addressee = getVal(['addressee', 'mailingname', 'formattedname']);
+            const salutation = getVal(['salutation', 'dear', 'informalname']);
+            const address = getVal(['address', 'mailingaddress', 'streetaddress', 'street']);
+            const amount = getVal(['amount', 'gift', 'total', 'raised', 'contribution']);
+            const visited = getVal(['visited', 'lastvisited', 'visitdate']);
+            const interests = getVal(['interests', 'interest', 'tags']);
+            const notes = getVal(['notes', 'staffnotes', 'comments', 'comment']);
 
-    const batch = rows.map((d: any) => {
-      const firstName = getVal(d, ["firstname", "first"]);
-      const lastName = getVal(d, ["lastname", "last"]);
-      const name =
-        getVal(d, ["name", "donor", "donorname", "fullname", "names", "addressee"]) ||
-        `${firstName} ${lastName}`.trim() ||
-        "Unknown";
-
-      return {
-        name,
-        firstName,
-        lastName,
-        email: getVal(d, ["email", "emailaddress", "mail"]),
-        phone: getVal(d, ["phone", "phonenumber", "cell", "mobile", "tel"]),
-        addressee: getVal(d, ["addressee", "mailingname", "formattedname"]),
-        salutation: getVal(d, ["salutation", "dear", "informalname"]),
-        address: getVal(d, ["address", "mailingaddress", "streetaddress", "street"]),
-        amount: getVal(d, ["amount", "gift", "total", "raised", "contribution", "donationamount"]),
-        visited: getVal(d, ["visited", "lastvisited", "visitdate"]),
-        interests: getVal(d, ["interests", "interest", "tags"]),
-        notes: getVal(d, ["notes", "staffnotes", "comments", "comment"]),
-        campaignId,
-        userId: user.uid,
-        createdAt: new Date().toISOString(),
-      };
-    });
-  return {
-    name,
-    email,
-    phone,
-    addressee,
-    salutation,
-    address,
-    amount,
-    visited,
-    interests,
-    notes,
-  };
-});
             return {
               campaignId,
               userId: user.uid,
