@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Application user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "A self-contained stewardship session",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "totalRaised": { "type": "string" },
+        "programs": { "type": "string" },
+        "impactDescription": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title"]
+    },
+    "Donor": {
+      "title": "Donor",
+      "description": "Donor information within a campaign",
+      "type": "object",
+      "properties": {
+        "campaignId": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "string" },
+        "fund": { "type": "string" },
+        "date": { "type": "string" },
+        "history": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "generated", "approved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["campaignId", "userId", "name"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Generated stewardship content for a donor",
+      "type": "object",
+      "properties": {
+        "donorId": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "emailBody": { "type": "string" },
+        "smsBody": { "type": "string" },
+        "callPoints": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["donorId", "campaignId", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Stewardship campaigns"
+    },
+    "/campaigns/{campaignId}/donors/{donorId}": {
+      "schema": "Donor",
+      "description": "Donors associated with a campaign"
+    },
+    "/campaigns/{campaignId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Generated messages for donors"
+    }
+  }
+}

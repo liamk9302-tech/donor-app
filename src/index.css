@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-primary: #5A5A40;
+  --color-primary-dark: #484833;
+  --color-natural-bg: #FDFCFB;
+  --color-natural-surface: #F8F7F3;
+  --color-natural-accent: #F1EFE9;
+  --color-natural-border: #E8E4DF;
+  --color-natural-text: #3D3A35;
+  --color-natural-text-dark: #2D2A26;
+  --color-natural-text-muted: #8C887F;
+}

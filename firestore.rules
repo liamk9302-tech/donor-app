@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- User Rules ---
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['uid', 'email'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 256;
+    }
+
+    // --- Campaign Rules ---
+    match /campaigns/{campaignId} {
+      function isValidCampaign(data) {
+        return data.userId == request.auth.uid
+          && data.title is string && data.title.size() > 0 && data.title.size() <= 256;
+      }
+
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isOwner(resource.data.userId);
+      allow create: if isSignedIn() && isValidCampaign(request.resource.data);
+      allow update: if isOwner(resource.data.userId) && isValidCampaign(request.resource.data)
+        && request.resource.data.userId == resource.data.userId; // Immutable owner
+      allow delete: if isOwner(resource.data.userId);
+
+      // --- Donor Rules ---
+      match /donors/{donorId} {
+        function isValidDonor(data) {
+          return data.userId == request.auth.uid
+            && data.campaignId == campaignId
+            && data.name is string && data.name.size() > 0 && data.name.size() <= 256;
+        }
+
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow get: if isOwner(resource.data.userId);
+        allow create: if isSignedIn() && isValidDonor(request.resource.data)
+          && get(/databases/$(database)/documents/campaigns/$(campaignId)).data.userId == request.auth.uid;
+        allow update: if isOwner(resource.data.userId) && isValidDonor(request.resource.data)
+          && request.resource.data.userId == resource.data.userId;
+        allow delete: if isOwner(resource.data.userId);
+      }
+
+      // --- Message Rules ---
+      match /messages/{messageId} {
+        function isValidMessage(data) {
+          return data.userId == request.auth.uid
+            && data.campaignId == campaignId
+            && data.donorId is string;
+        }
+
+        allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+        allow get: if isOwner(resource.data.userId);
+        allow create: if isSignedIn() && isValidMessage(request.resource.data)
+          && get(/databases/$(database)/documents/campaigns/$(campaignId)).data.userId == request.auth.uid;
+        allow update: if isOwner(resource.data.userId) && isValidMessage(request.resource.data)
+          && request.resource.data.userId == resource.data.userId;
+        allow delete: if isOwner(resource.data.userId);
+      }
+    }
+  }
+}
