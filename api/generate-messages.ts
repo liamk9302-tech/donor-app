@@ -18,7 +18,10 @@ export default async function handler(req: any, res: any) {
       .map((d: any, index: number) => {
         return `
 DONOR ${index + 1}
-Name: ${d.name || ""}
+Salutation: ${d.salutation || ""}
+First Name: ${d.firstName || ""}
+Last Name: ${d.lastName || ""}
+Preferred Name: ${d.preferredName || ""}
 Email: ${d.email || ""}
 Donation Amount: ${d.amount || ""}
 Campaign: ${d.campaign || ""}
@@ -98,6 +101,27 @@ Return ONLY valid JSON in this exact format:
     );
 
     const rawData = await geminiResponse.json();
+
+  if (
+  rawData?.error?.message?.includes("quota") ||
+  rawData?.error?.message?.includes("Quota")
+) {
+  return res.status(200).json({
+    messages: donors.map((d: any) => ({
+      donorName: `${d.firstName || ""} ${d.lastName || ""}`.trim() || d.name || "Donor",
+      email: `Dear ${d.salutation || ""} ${d.lastName || "Friend"},
+
+Thank you for supporting our mission. Your contribution helps support civic education and engagement opportunities for students and communities.
+
+We are grateful for your partnership and for being part of this work.
+
+With gratitude,
+GoodCircle`,
+      sms: `Thank you for supporting our mission, ${d.preferredName || d.firstName || "friend"}! We truly appreciate it.`,
+      callScript: `Hi ${d.preferredName || d.firstName || "there"}, I just wanted to personally thank you for your support and your connection to our mission.`
+    }))
+  });
+}
 
     if (!geminiResponse.ok) {
       console.error("Gemini API Error:", rawData);
